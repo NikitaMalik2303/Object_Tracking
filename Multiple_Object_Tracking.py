@@ -46,5 +46,29 @@ while True :
     print("Press any other key to select the next object")
 
     k = cv2.waitKey(0) & 0XFF
-    if k == 113:
+    if k == 113:      # Q
+        break
+
+
+tracker_type = "CSRT"
+multi_tracker = cv2.legacy.MultiTracker_create()
+
+for bbox in bboxes :
+    multi_tracker.add(create_tracker_by_name(tracker_type), frame, bbox)
+
+while video.isOpened():
+
+    ok,frame = video.read()
+    if not ok :
+        break
+
+    ok, boxes = multi_tracker.update(frame)
+
+    for i, new_box in enumerate(boxes):
+        (x, y, w, h) = [int(v) for v in new_box]
+        cv2.rectangle(frame, (x,y), (x+w, y+h), colors[i], 2)
+
+    cv2.imshow("Multitracker", frame)
+
+    if cv2.waitKey(1) & 0XFF == 27 :   #esc
         break
